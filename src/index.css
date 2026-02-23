@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", sans-serif;
+  --font-hand: "Gaegu", cursive;
+  --font-sketch: "Architects Daughter", cursive;
+  --font-marker: "Permanent Marker", cursive;
+  --font-bubble: "Gochi Hand", cursive;
+  --font-patrick: "Patrick Hand", cursive;
+  --font-kalam: "Kalam", cursive;
+  --font-mono: "Space Mono", monospace;
+
+  --color-primary: #2D3436;
+  --color-accent: #6366F1;
+  --color-accent-blue: #3b82f6;
+  --color-accent-green: #22c55e;
+  --color-accent-amber: #f59e0b;
+  --color-ink-black: #2D3436;
+  --color-ink-red: #D63031;
+  --color-ink-amber: #E67E22;
+  --color-graph-blue: #E1EAF4;
+  --color-graph-line: #ccd9eb;
+  --color-marker-red: #ef4444;
+}
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .sketch-border {
+    border: 2px solid #2D3436;
+  }
+  
+  .offset-shadow {
+    box-shadow: 4px 4px 0px 0px rgba(45, 52, 54, 1);
+  }
+  
+  .offset-shadow-sm {
+    box-shadow: 2px 2px 0px 0px rgba(45, 52, 54, 1);
+  }
+
+  .graph-paper-bg {
+    background-color: #F8FAFC;
+    background-image: 
+        linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .ink-stamp {
+    border: 1.5px solid currentColor;
+    padding: 2px 8px;
+    transform: rotate(-1deg);
+    display: inline-flex;
+    align-items: center;
+    border-radius: 2px;
+  }
+}
