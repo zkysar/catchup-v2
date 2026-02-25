@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import RequestDetailLayout from '../components/RequestDetailLayout';
 import InfoCard from '../components/InfoCard';
 import BottomSheet from '../components/BottomSheet';
@@ -12,7 +12,56 @@ const FRIENDS = [
   { name: 'Jess', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBQ-yNzPrwGt1nLIDfS4EFwfHVh2ipQZCYO030ONZ8O93GiBpdy54xPyJFDALHuwRxmoNHZTrp8SoiBDMPYx2iDSNnXpZ6ZH3yRyHdM9TNe36Ng7tKlCfEJODRHhFIzT_iap6xjhv7c__2AwpmYVEUE0buaso8SRc9NUUh79SJmZ4EyScyu4UIA_vitDCZM8mm60o-4Ce2eQT5JTd0zYy0dqsMs9A9PSNxTw-R8hyn8BNVdz-k3BY19yLlGtt_fUh-gIsr4vro32A' },
   { name: 'Alex', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDbLycX7o1KSrxVubg6z3p5eGbXZx47qwXxT1HBISwz9IybR2u8st1edq2kqqzID_owV-YAIyAKV4FrElPXMk7-TTKxWL5R8eC-dnf1veLu8iqqLhmmvzkarew5U09Hax-ylFV-4T_PZXQudQlWAmrHz8lV4CgNfvih2LkLK1K-4XNSqenvdmbOLEWUHmwslApP-uGsY_oe8UkX6gasgBeT--w21M0cnwmKJr0kyQ4tSXFE1fIQ8ZSYw0Sv1mh_Uw1pbXZdlo_YRA' },
   { name: 'Tom', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBXEX5aCl_mcQR3imfyP2-iFOrrvtVCzXCFMXvvHmp4cL3XvqeBTVZOwipo9yij_s6IRt_Z9bl-rXb9m1nxg9S-_RNqOfq5UEHXWfdLJbDap8aMeG9u99JvCnW50Bogyk4-CBswixN6mxgtdXFuoflqovMCVVNUqda8fTTzE9tZrhu1aRttUv3ltax3SSvSMbZArWk3UuEvshjz1Flmd7Z8TMM72uC9nuapgVZTdlJBig0XUnbhXpZxYKneKahoHjXFyGnYfMkSSA' },
+  { name: 'Samantha', img: 'https://i.pravatar.cc/150?u=samantha' },
+  { name: 'Marcus', img: 'https://i.pravatar.cc/150?u=marcus' },
+  { name: 'Olivia', img: 'https://i.pravatar.cc/150?u=olivia' },
+  { name: 'James', img: 'https://i.pravatar.cc/150?u=james' },
+  { name: 'Emma', img: 'https://i.pravatar.cc/150?u=emma' },
+  { name: 'Noah', img: 'https://i.pravatar.cc/150?u=noah' },
+  { name: 'Sophia', img: 'https://i.pravatar.cc/150?u=sophia' },
+  { name: 'Liam', img: 'https://i.pravatar.cc/150?u=liam' },
+  { name: 'Isabella', img: 'https://i.pravatar.cc/150?u=isabella' },
+  { name: 'Mason', img: 'https://i.pravatar.cc/150?u=mason' },
+  { name: 'Charlotte', img: 'https://i.pravatar.cc/150?u=charlotte' },
+  { name: 'Ethan', img: 'https://i.pravatar.cc/150?u=ethan' },
+  { name: 'Amelia', img: 'https://i.pravatar.cc/150?u=amelia' },
+  { name: 'Sebastian', img: 'https://i.pravatar.cc/150?u=sebastian' },
+  { name: 'Harper', img: 'https://i.pravatar.cc/150?u=harper' },
 ];
+
+/** Fuzzy subsequence match — returns matched character indices or null */
+function fuzzyMatch(text: string, query: string): number[] | null {
+  const lower = text.toLowerCase();
+  const q = query.toLowerCase();
+  const indices: number[] = [];
+  let qi = 0;
+  for (let i = 0; i < lower.length && qi < q.length; i++) {
+    if (lower[i] === q[qi]) {
+      indices.push(i);
+      qi++;
+    }
+  }
+  return qi === q.length ? indices : null;
+}
+
+/** Render name with matched characters highlighted */
+function HighlightedName({ name, matchIndices }: { name: string; matchIndices: number[] | null }) {
+  if (!matchIndices || matchIndices.length === 0) {
+    return <span>{name}</span>;
+  }
+  const matchSet = new Set(matchIndices);
+  return (
+    <span>
+      {name.split('').map((char, i) =>
+        matchSet.has(i) ? (
+          <span key={i} className="text-accent font-black underline decoration-2 decoration-accent/60">{char}</span>
+        ) : (
+          <span key={i}>{char}</span>
+        )
+      )}
+    </span>
+  );
+}
 
 type SheetType = 'duration' | 'timeWindow' | 'location' | 'participants' | null;
 
@@ -25,6 +74,38 @@ export default function DraftDetail() {
   const [location, setLocation] = useState('');
   const [locationInput, setLocationInput] = useState('');
   const [invited, setInvited] = useState([FRIENDS[0], FRIENDS[1], FRIENDS[2]]);
+  const [contactSearch, setContactSearch] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Focus search input when participants sheet opens
+  useEffect(() => {
+    if (sheet === 'participants') {
+      setContactSearch('');
+      setTimeout(() => searchInputRef.current?.focus(), 100);
+    }
+  }, [sheet]);
+
+  const filteredFriends = useMemo(() => {
+    if (!contactSearch.trim()) {
+      // When not searching, show invited first, then the rest
+      const invitedNames = new Set(invited.map(p => p.name));
+      const invitedFriends = FRIENDS.filter(f => invitedNames.has(f.name));
+      const rest = FRIENDS.filter(f => !invitedNames.has(f.name));
+      return [...invitedFriends, ...rest].map(f => ({ friend: f, matchIndices: null as number[] | null }));
+    }
+    const results: { friend: typeof FRIENDS[0]; matchIndices: number[]; score: number }[] = [];
+    for (const friend of FRIENDS) {
+      const indices = fuzzyMatch(friend.name, contactSearch.trim());
+      if (indices) {
+        // Score: prefer matches that start earlier and are more compact
+        const spread = indices.length > 1 ? indices[indices.length - 1] - indices[0] : 0;
+        const score = indices[0] * 100 + spread;
+        results.push({ friend, matchIndices: indices, score });
+      }
+    }
+    results.sort((a, b) => a.score - b.score);
+    return results;
+  }, [contactSearch, invited]);
 
   const toggleInvite = (friend: typeof FRIENDS[0]) => {
     setInvited(prev =>
@@ -188,27 +269,70 @@ export default function DraftDetail() {
 
       {/* Participants Picker */}
       <BottomSheet open={sheet === 'participants'} onClose={() => setSheet(null)} title="Who's Invited?">
-        <div className="flex flex-col gap-2">
-          {FRIENDS.map(friend => {
-            const isInvited = invited.some(p => p.name === friend.name);
-            return (
+        <div className="flex flex-col gap-3">
+          {/* Search input */}
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-lg text-slate-400">search</span>
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={contactSearch}
+              onChange={e => setContactSearch(e.target.value)}
+              placeholder="Search contacts..."
+              className="w-full pl-10 pr-10 py-3 border-[1.5px] border-black font-sketch text-lg focus:outline-none focus:ring-2 focus:ring-accent/30"
+            />
+            {contactSearch && (
               <button
-                key={friend.name}
-                onClick={() => toggleInvite(friend)}
-                className={`flex items-center gap-4 px-4 py-3 border-[1.5px] border-black transition-all ${
-                  isInvited
-                    ? 'bg-accent/10 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                    : 'bg-white active:bg-slate-50'
-                }`}
+                onClick={() => { setContactSearch(''); searchInputRef.current?.focus(); }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 active:bg-slate-300"
               >
-                <img alt={friend.name} className="h-10 w-10 rounded-full border-2 border-black object-cover" src={friend.img} />
-                <span className="font-sketch text-lg font-bold flex-1 text-left">{friend.name}</span>
-                <div className={`flex h-6 w-6 items-center justify-center border-2 border-black ${isInvited ? 'bg-accent' : 'bg-white'}`}>
-                  {isInvited && <span className="material-symbols-outlined text-sm text-white">check</span>}
-                </div>
+                <span className="material-symbols-outlined text-xs">close</span>
               </button>
-            );
-          })}
+            )}
+          </div>
+
+          {/* Selected count pill */}
+          {invited.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-accent/10 border border-accent/30 text-accent text-xs font-bold font-sketch rounded-full">
+                <span className="material-symbols-outlined text-xs">group</span>
+                {invited.length} selected
+              </span>
+            </div>
+          )}
+
+          {/* Results */}
+          <div className="flex flex-col gap-2">
+            {filteredFriends.length === 0 ? (
+              <div className="flex flex-col items-center py-8 text-center">
+                <span className="material-symbols-outlined text-3xl text-slate-300 mb-2">person_search</span>
+                <p className="font-sketch text-sm text-slate-400">No contacts match "{contactSearch}"</p>
+              </div>
+            ) : (
+              filteredFriends.map(({ friend, matchIndices }) => {
+                const isInvited = invited.some(p => p.name === friend.name);
+                return (
+                  <button
+                    key={friend.name}
+                    onClick={() => toggleInvite(friend)}
+                    className={`flex items-center gap-4 px-4 py-3 border-[1.5px] border-black transition-all ${
+                      isInvited
+                        ? 'bg-accent/10 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                        : 'bg-white active:bg-slate-50'
+                    }`}
+                  >
+                    <img alt={friend.name} className="h-10 w-10 rounded-full border-2 border-black object-cover" src={friend.img} />
+                    <span className="font-sketch text-lg font-bold flex-1 text-left">
+                      <HighlightedName name={friend.name} matchIndices={matchIndices} />
+                    </span>
+                    <div className={`flex h-6 w-6 items-center justify-center border-2 border-black transition-colors ${isInvited ? 'bg-accent' : 'bg-white'}`}>
+                      {isInvited && <span className="material-symbols-outlined text-sm text-white">check</span>}
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
         </div>
       </BottomSheet>
     </>
