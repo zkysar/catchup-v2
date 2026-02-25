@@ -2,7 +2,18 @@ import RequestDetailLayout from '../components/RequestDetailLayout';
 import InfoCard from '../components/InfoCard';
 import SectionHeader from '../components/SectionHeader';
 
+import BottomSheet from '../components/BottomSheet';
+import { useState } from 'react';
+
+const DURATION_OPTIONS = ['30 min', '1 hour', '1.5 hours', '2 hours', '3 hours', '4 hours', 'All day'];
+const TIME_WINDOW_OPTIONS = ['Today', 'Tomorrow', 'This Weekend', 'This Week', 'Next Week', 'Next 2 Weeks', 'This Month'];
+
+type SheetType = 'duration' | 'timeWindow' | null;
+
 export default function BlockedDetail() {
+  const [sheet, setSheet] = useState<SheetType>(null);
+  const [duration, setDuration] = useState('4 hours');
+  const [timeWindow, setTimeWindow] = useState('This Weekend');
   const availabilityRows = [
     { img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBeE_ahJaqQTIo-GTUKohYHsBbYTdCbmF3kB4JtFpl8-yFRL6CtlLwx-XU8TfJ1gAPgaCQVDN0kfbooNHhhnEB167krZsvuHbiVu_11I3mQDhRuWuYlIcmy2hRIqHQeNlyWJBo_7uSrsDeuPdK0xiVnqUDAzjg5k6UCZgtJU3FwCW-7-QWmhzwXuzw64UknnX2OfpR_8D08jSTwmJ45mqWaloAMkCCB73q2LW8haOCVZ4m-KM2a6SxClb1MiFcD2S-L7D4e9g5-IQ', left: '0%', width: '40%' },
     { img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD0QDE_V8KKLLoc-tsZyXZ23DLB3eWQ3pl9GiqFssvuKhjC6F2XnQjIAEh8EbJTiLvzenIG3ps5MBZHP-xCnt-YSLiPq-NOf47zcdB0ZBzH4BFTsAOsDi4Xvf79ajPd4KJzsMVXeCROBmZ9ufwHb1r8b9MambYMUCK1RQeNZZW1g2Trsvjwk9PghGo-Wmf2znC272NPbsOHa54jDmxpWaiJ4t6ydTkt20i4Z6sR6_Y-ZS0CtdJeW5JPkThdLgKRQBZhLrUYMD3BkQ', left: '30%', width: '40%' },
@@ -11,6 +22,7 @@ export default function BlockedDetail() {
   ] as const;
 
   return (
+    <>
     <RequestDetailLayout
       status={{ label: 'Blocked', icon: 'block', colorClass: 'text-ink-red', bgClass: 'bg-red-50' }}
       title="Hiking Trip"
@@ -20,8 +32,8 @@ export default function BlockedDetail() {
         { label: 'Edit Request', primary: true },
       ]}
     >
-      <InfoCard icon="schedule" label="Duration" value="4 hours" />
-      <InfoCard icon="calendar_today" label="Time Window" value="This Weekend (Sat-Sun)" />
+      <InfoCard icon="schedule" label="Duration" value={duration} onClick={() => setSheet('duration')} />
+      <InfoCard icon="calendar_today" label="Time Window" value={timeWindow} onClick={() => setSheet('timeWindow')} />
 
       {/* Conflict Alert */}
       <div className="sketch-border bg-white p-5">
@@ -104,5 +116,44 @@ export default function BlockedDetail() {
         </div>
       </div>
     </RequestDetailLayout>
+
+      <BottomSheet open={sheet === 'duration'} onClose={() => setSheet(null)} title="Duration">
+        <div className="flex flex-col gap-2">
+          {DURATION_OPTIONS.map(opt => (
+            <button
+              key={opt}
+              onClick={() => { setDuration(opt); setSheet(null); }}
+              className={`flex items-center justify-between px-4 py-3 border-[1.5px] border-black transition-all ${
+                duration === opt
+                  ? 'bg-accent text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                  : 'bg-white active:bg-slate-50'
+              }`}
+            >
+              <span className="font-sketch text-lg font-bold">{opt}</span>
+              {duration === opt && <span className="material-symbols-outlined text-lg">check</span>}
+            </button>
+          ))}
+        </div>
+      </BottomSheet>
+
+      <BottomSheet open={sheet === 'timeWindow'} onClose={() => setSheet(null)} title="Time Window">
+        <div className="flex flex-col gap-2">
+          {TIME_WINDOW_OPTIONS.map(opt => (
+            <button
+              key={opt}
+              onClick={() => { setTimeWindow(opt); setSheet(null); }}
+              className={`flex items-center justify-between px-4 py-3 border-[1.5px] border-black transition-all ${
+                timeWindow === opt
+                  ? 'bg-accent text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                  : 'bg-white active:bg-slate-50'
+              }`}
+            >
+              <span className="font-sketch text-lg font-bold">{opt}</span>
+              {timeWindow === opt && <span className="material-symbols-outlined text-lg">check</span>}
+            </button>
+          ))}
+        </div>
+      </BottomSheet>
+    </>
   );
 }
