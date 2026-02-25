@@ -17,8 +17,8 @@ interface ActionButton {
 
 interface RequestDetailLayoutProps {
   status: StatusConfig;
-  title: string;
-  subtitle?: string;
+  title: ReactNode;
+  subtitle?: ReactNode;
   heroImage?: string;
   heroImageAlt?: string;
   headerAction?: { label: string; icon?: string };
@@ -54,7 +54,7 @@ export default function RequestDetailLayout({
           <div className="sketch-border overflow-hidden -mx-6 -mt-6 border-t-0">
             <div className="h-48 relative">
               <img
-                alt={heroImageAlt || title}
+                alt={heroImageAlt || 'Hero image'}
                 className="h-full w-full object-cover grayscale-[20%]"
                 src={heroImage}
               />
@@ -68,8 +68,12 @@ export default function RequestDetailLayout({
             <span className="text-xs font-bold uppercase tracking-widest">{status.label}</span>
           </div>
           <div className="flex flex-col gap-1">
-            <h1 className="text-4xl font-black font-sketch tracking-tight">{title}</h1>
-            {subtitle && <p className="text-lg font-medium opacity-60 font-sketch">{subtitle}</p>}
+            {typeof title === 'string' ? (
+              <h1 className="text-4xl font-black font-sketch tracking-tight">{title}</h1>
+            ) : title}
+            {subtitle && (typeof subtitle === 'string' ? (
+              <p className="text-lg font-medium opacity-60 font-sketch">{subtitle}</p>
+            ) : subtitle)}
           </div>
         </div>
 

@@ -18,6 +18,8 @@ type SheetType = 'duration' | 'timeWindow' | 'location' | 'participants' | null;
 
 export default function DraftDetail() {
   const [sheet, setSheet] = useState<SheetType>(null);
+  const [title, setTitle] = useState('Coffee Catchup');
+  const [description, setDescription] = useState('');
   const [duration, setDuration] = useState('1 hour');
   const [timeWindow, setTimeWindow] = useState('This Weekend');
   const [location, setLocation] = useState('');
@@ -36,8 +38,33 @@ export default function DraftDetail() {
     <>
       <RequestDetailLayout
         status={{ label: 'Draft', icon: 'edit_note', colorClass: 'text-slate-500', bgClass: 'bg-slate-100' }}
-        title="Coffee Catchup"
-        subtitle={`~ ${duration}`}
+        title={
+          <div className="group relative flex items-center gap-2">
+            <input
+              type="text"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="Catchup title..."
+              className="w-full text-4xl font-black font-sketch tracking-tight bg-transparent outline-none placeholder:text-slate-300 border-b-2 border-dashed border-slate-200 focus:border-accent pb-1 transition-colors"
+            />
+            <span className="material-symbols-outlined text-slate-300 text-xl group-focus-within:text-accent transition-colors shrink-0">edit</span>
+          </div>
+        }
+        subtitle={
+          <div className="group relative flex items-center gap-2">
+            <textarea
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              placeholder="Add a description..."
+              rows={1}
+              maxLength={200}
+              onInput={e => { const t = e.target as HTMLTextAreaElement; t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 4.5 * 28) + 'px'; }}
+              style={{ scrollbarWidth: 'none' }}
+              className="w-full text-lg font-medium font-sketch bg-transparent outline-none text-black/60 placeholder:text-slate-300 border-b border-dashed border-slate-200 focus:border-accent pb-1 transition-colors resize-none leading-7 max-h-[84px] overflow-y-auto [&::-webkit-scrollbar]:hidden"
+            />
+            <span className="material-symbols-outlined text-slate-300 text-sm group-focus-within:text-accent transition-colors shrink-0">edit</span>
+          </div>
+        }
         headerAction={{ label: 'More', icon: 'more_horiz' }}
         actions={[
           { label: 'Preview What Will Be Sent' },
