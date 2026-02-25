@@ -1,6 +1,22 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
+const suggestions = [
+  { icon: 'music_note', label: 'Band practice this week' },
+  { icon: 'restaurant', label: 'Dinner with roommates' },
+  { icon: 'local_cafe', label: 'Coffee tomorrow' }
+];
 
 export default function NewRequest() {
+  const [text, setText] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = (input: string) => {
+    const trimmed = input.trim();
+    if (!trimmed) return;
+    navigate('/confirm', { state: { prompt: trimmed } });
+  };
+
   return (
     <div className="font-sans flex flex-col overflow-hidden text-slate-900 transition-colors duration-200 min-h-screen bg-[#f8fafc]" style={{
         backgroundImage: `linear-gradient(to right, #e2e8f0 1px, transparent 1px), linear-gradient(to bottom, #e2e8f0 1px, transparent 1px)`,
@@ -31,12 +47,12 @@ export default function NewRequest() {
 
         <div className="w-full mb-6">
           <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
-            {[
-                { icon: 'music_note', label: 'Band practice this week' },
-                { icon: 'restaurant', label: 'Dinner with roommates' },
-                { icon: 'local_cafe', label: 'Coffee tomorrow' }
-            ].map((item, i) => (
-                <button key={i} className="flex-none h-10 px-4 border-2 border-black bg-white hover:bg-yellow-50 transition-colors flex items-center gap-2">
+            {suggestions.map((item, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSubmit(item.label)}
+                  className="flex-none h-10 px-4 border-2 border-black bg-white hover:bg-yellow-50 transition-colors flex items-center gap-2"
+                >
                     <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
                     <span className="font-sketch text-sm font-bold text-slate-800">{item.label}</span>
                 </button>
@@ -50,18 +66,29 @@ export default function NewRequest() {
               <button aria-label="Add Image" className="flex-none w-10 h-10 flex items-center justify-center text-slate-500 hover:text-black transition-colors ml-1 mb-1">
                 <span className="material-symbols-outlined text-2xl">add_photo_alternate</span>
               </button>
-              <textarea 
-                className="form-textarea flex-1 w-full min-w-0 bg-transparent border-none focus:ring-0 p-3 font-sketch text-lg text-slate-900 placeholder:text-slate-400 resize-none max-h-32 min-h-[52px] leading-tight outline-none" 
-                placeholder='Try: "dinner next Friday"' 
+              <textarea
+                className="form-textarea flex-1 w-full min-w-0 bg-transparent border-none focus:ring-0 p-3 font-sketch text-lg text-slate-900 placeholder:text-slate-400 resize-none max-h-32 min-h-[52px] leading-tight outline-none"
+                placeholder='Try: "dinner next Friday"'
                 rows={1}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(text);
+                  }
+                }}
               ></textarea>
               <div className="flex items-center gap-1 pr-1 pb-1">
                 <button aria-label="Voice Input" className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-black transition-colors">
                   <span className="material-symbols-outlined text-2xl">mic</span>
                 </button>
-                <Link to="/confirm" className="h-10 w-10 flex items-center justify-center bg-black text-white hover:bg-slate-800 transition-colors">
+                <button
+                  onClick={() => handleSubmit(text)}
+                  className="h-10 w-10 flex items-center justify-center bg-black text-white hover:bg-slate-800 transition-colors"
+                >
                   <span className="material-symbols-outlined text-2xl">arrow_upward</span>
-                </Link>
+                </button>
               </div>
             </div>
           </div>
