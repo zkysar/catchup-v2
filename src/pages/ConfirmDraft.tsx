@@ -1,6 +1,56 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
+const MOCK_INTERPRETATIONS: Record<string, {
+  name: string;
+  duration: string;
+  timeframe: string;
+  participants: { name: string; img: string }[];
+}> = {
+  'Band practice this week': {
+    name: 'Band practice',
+    duration: '2 hours',
+    timeframe: 'This week',
+    participants: [
+      { name: 'Alex', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDB5KrD8nitQF7n6yG_PosLKkXkKuJ3QRWDny9uxUhGfvx4686DwAxAs1XLLg-WLc5X8fP-HJ3KBkzKghBulcco7KgJRgb20_8JA29um0WIUs0bc8CLTs0PPPUSWKqh2rKNzGIquVqnSEYTo8d6CwD5dyjDUHn14g_rixhMp4t0jaR1me3tSeW21YosuEki5gu7JQDzPSJcLwbJAvYcyY4YMrgrCBHeK_POlzVSm-k2gjFHi3GJ7vVf3_Dg2Fircus2Pd3Z4vv-wg' },
+      { name: 'Sarah', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBHW1qxNDO9YCJRZ5qc7wd_A1yMdLNdR87a-izKjG2tute7yCKBcNXE7jq_akkpvjySipdZpUPmDgbgKbyEe2cJgS-jwLoTRKYNCDBJtjdqU3Ccm6wKBxDPCPR5D9D21Kdl9UVgRIw1s_maTNbSlY3drLkDPlaHNjA3Kd7n4-keJ0ofaBpDb1AOw5H-w5LnSDAoN-pubYN76zPEqRxlKmk49Pw-y-Fu6vq9cIkkMPJeqagi0gnCygNlZnzbBVkfHvw_5AMGsyqcrQ' },
+      { name: 'Mike', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCHrB_R9tcjY8o4TNs5T0CdovS-jjEZIX3u8kCuMi9lMVY0frxQkzLcmtz42cynmQlNg4OtZPjpwh3yGN79D5Kt8o8BoN2op7MWxoQ4NE0-UYmnF2XGEw2xk8obJUJ9nyMa3rqaQ_s0xNMscf2v5ZCZC26wnx3eBeVk21MuhEbWF6balQkctsp94N5HyBctDJgvOcpYckKFZe6ukIhSpiO-RnqY7lieuF1RjbkdpFp_yXW2I5fISCUUcjOew8L3ixvduz6BuebYdQ' }
+    ]
+  },
+  'Dinner with roommates': {
+    name: 'Dinner',
+    duration: '1.5 hours',
+    timeframe: 'This week',
+    participants: [
+      { name: 'Jordan', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDB5KrD8nitQF7n6yG_PosLKkXkKuJ3QRWDny9uxUhGfvx4686DwAxAs1XLLg-WLc5X8fP-HJ3KBkzKghBulcco7KgJRgb20_8JA29um0WIUs0bc8CLTs0PPPUSWKqh2rKNzGIquVqnSEYTo8d6CwD5dyjDUHn14g_rixhMp4t0jaR1me3tSeW21YosuEki5gu7JQDzPSJcLwbJAvYcyY4YMrgrCBHeK_POlzVSm-k2gjFHi3GJ7vVf3_Dg2Fircus2Pd3Z4vv-wg' },
+      { name: 'Taylor', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBHW1qxNDO9YCJRZ5qc7wd_A1yMdLNdR87a-izKjG2tute7yCKBcNXE7jq_akkpvjySipdZpUPmDgbgKbyEe2cJgS-jwLoTRKYNCDBJtjdqU3Ccm6wKBxDPCPR5D9D21Kdl9UVgRIw1s_maTNbSlY3drLkDPlaHNjA3Kd7n4-keJ0ofaBpDb1AOw5H-w5LnSDAoN-pubYN76zPEqRxlKmk49Pw-y-Fu6vq9cIkkMPJeqagi0gnCygNlZnzbBVkfHvw_5AMGsyqcrQ' }
+    ]
+  },
+  'Coffee tomorrow': {
+    name: 'Coffee',
+    duration: '1 hour',
+    timeframe: 'Tomorrow',
+    participants: [
+      { name: 'Sarah', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBHW1qxNDO9YCJRZ5qc7wd_A1yMdLNdR87a-izKjG2tute7yCKBcNXE7jq_akkpvjySipdZpUPmDgbgKbyEe2cJgS-jwLoTRKYNCDBJtjdqU3Ccm6wKBxDPCPR5D9D21Kdl9UVgRIw1s_maTNbSlY3drLkDPlaHNjA3Kd7n4-keJ0ofaBpDb1AOw5H-w5LnSDAoN-pubYN76zPEqRxlKmk49Pw-y-Fu6vq9cIkkMPJeqagi0gnCygNlZnzbBVkfHvw_5AMGsyqcrQ' }
+    ]
+  }
+};
+
+const DEFAULT_INTERPRETATION = {
+  name: 'Hangout',
+  duration: '1 hour',
+  timeframe: 'This week',
+  participants: [
+    { name: 'Alex', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDB5KrD8nitQF7n6yG_PosLKkXkKuJ3QRWDny9uxUhGfvx4686DwAxAs1XLLg-WLc5X8fP-HJ3KBkzKghBulcco7KgJRgb20_8JA29um0WIUs0bc8CLTs0PPPUSWKqh2rKNzGIquVqnSEYTo8d6CwD5dyjDUHn14g_rixhMp4t0jaR1me3tSeW21YosuEki5gu7JQDzPSJcLwbJAvYcyY4YMrgrCBHeK_POlzVSm-k2gjFHi3GJ7vVf3_Dg2Fircus2Pd3Z4vv-wg' },
+    { name: 'Sarah', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBHW1qxNDO9YCJRZ5qc7wd_A1yMdLNdR87a-izKjG2tute7yCKBcNXE7jq_akkpvjySipdZpUPmDgbgKbyEe2cJgS-jwLoTRKYNCDBJtjdqU3Ccm6wKBxDPCPR5D9D21Kdl9UVgRIw1s_maTNbSlY3drLkDPlaHNjA3Kd7n4-keJ0ofaBpDb1AOw5H-w5LnSDAoN-pubYN76zPEqRxlKmk49Pw-y-Fu6vq9cIkkMPJeqagi0gnCygNlZnzbBVkfHvw_5AMGsyqcrQ' }
+  ]
+};
 
 export default function ConfirmDraft() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const prompt = (location.state as { prompt?: string })?.prompt || 'Band practice this week';
+  const data = MOCK_INTERPRETATIONS[prompt] || { ...DEFAULT_INTERPRETATION, name: prompt };
+
   return (
     <div className="font-sans h-screen flex flex-col overflow-hidden text-slate-900 transition-colors duration-200 bg-[#fdfdfd]" style={{
         backgroundImage: `linear-gradient(rgba(79, 70, 229, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(79, 70, 229, 0.15) 1px, transparent 1px)`,
@@ -18,7 +68,7 @@ export default function ConfirmDraft() {
           <div className="relative border-2 border-black bg-white text-black py-4 px-6 max-w-[85%] shadow-[2px_3px_0px_rgba(0,0,0,0.1)]" style={{
             borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px'
           }}>
-            <p className="font-bubble text-lg leading-tight">Band practice for 2 hours with the usual crew sometime in the next 2 weeks.</p>
+            <p className="font-bubble text-lg leading-tight">{prompt}</p>
             <div className="absolute -bottom-[10px] right-[20px] w-[20px] h-[15px] bg-white border-r-2 border-b-2 border-black transform skew-y-[45deg]"></div>
           </div>
         </div>
@@ -32,7 +82,7 @@ export default function ConfirmDraft() {
           <div className="mb-6 group cursor-pointer">
             <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-1">Event Name</label>
             <div className="flex items-baseline justify-between">
-              <h3 className="font-patrick text-3xl text-black">Band practice</h3>
+              <h3 className="font-patrick text-3xl text-black">{data.name}</h3>
               <span className="material-symbols-outlined text-slate-300 text-sm">edit</span>
             </div>
           </div>
@@ -42,7 +92,7 @@ export default function ConfirmDraft() {
             <div className="flex items-baseline justify-between">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-slate-400 text-lg">timer</span>
-                <span className="font-patrick text-2xl text-black">2 hours</span>
+                <span className="font-patrick text-2xl text-black">{data.duration}</span>
               </div>
               <span className="material-symbols-outlined text-slate-300 text-sm">edit</span>
             </div>
@@ -56,11 +106,7 @@ export default function ConfirmDraft() {
               </button>
             </div>
             <div className="flex flex-wrap gap-3">
-              {[
-                { name: 'Alex', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDB5KrD8nitQF7n6yG_PosLKkXkKuJ3QRWDny9uxUhGfvx4686DwAxAs1XLLg-WLc5X8fP-HJ3KBkzKghBulcco7KgJRgb20_8JA29um0WIUs0bc8CLTs0PPPUSWKqh2rKNzGIquVqnSEYTo8d6CwD5dyjDUHn14g_rixhMp4t0jaR1me3tSeW21YosuEki5gu7JQDzPSJcLwbJAvYcyY4YMrgrCBHeK_POlzVSm-k2gjFHi3GJ7vVf3_Dg2Fircus2Pd3Z4vv-wg' },
-                { name: 'Sarah', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBHW1qxNDO9YCJRZ5qc7wd_A1yMdLNdR87a-izKjG2tute7yCKBcNXE7jq_akkpvjySipdZpUPmDgbgKbyEe2cJgS-jwLoTRKYNCDBJtjdqU3Ccm6wKBxDPCPR5D9D21Kdl9UVgRIw1s_maTNbSlY3drLkDPlaHNjA3Kd7n4-keJ0ofaBpDb1AOw5H-w5LnSDAoN-pubYN76zPEqRxlKmk49Pw-y-Fu6vq9cIkkMPJeqagi0gnCygNlZnzbBVkfHvw_5AMGsyqcrQ' },
-                { name: 'Mike', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCHrB_R9tcjY8o4TNs5T0CdovS-jjEZIX3u8kCuMi9lMVY0frxQkzLcmtz42cynmQlNg4OtZPjpwh3yGN79D5Kt8o8BoN2op7MWxoQ4NE0-UYmnF2XGEw2xk8obJUJ9nyMa3rqaQ_s0xNMscf2v5ZCZC26wnx3eBeVk21MuhEbWF6balQkctsp94N5HyBctDJgvOcpYckKFZe6ukIhSpiO-RnqY7lieuF1RjbkdpFp_yXW2I5fISCUUcjOew8L3ixvduz6BuebYdQ' }
-              ].map((p, i) => (
+              {data.participants.map((p, i) => (
                 <div key={i} className="inline-flex items-center bg-white border border-black px-2 py-1.5 gap-2">
                   <img alt={p.name} className="w-6 h-6 rounded-full object-cover border border-black/10" src={p.img} />
                   <span className="font-patrick text-lg text-slate-800 leading-none">{p.name}</span>
@@ -77,7 +123,7 @@ export default function ConfirmDraft() {
             <div className="flex items-baseline justify-between">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-slate-400 text-lg">calendar_today</span>
-                <span className="font-patrick text-2xl text-black">Next 2 weeks</span>
+                <span className="font-patrick text-2xl text-black">{data.timeframe}</span>
               </div>
               <span className="material-symbols-outlined text-slate-300 text-sm">edit</span>
             </div>
@@ -85,11 +131,17 @@ export default function ConfirmDraft() {
         </div>
 
         <div className="mt-auto pt-4 flex flex-col gap-4">
-          <button className="w-full h-14 bg-indigo-600 text-white font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-2 border-2 border-black shadow-[4px_4px_0px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#000] transition-all">
+          <button
+            onClick={() => navigate('/waiting')}
+            className="w-full h-14 bg-indigo-600 text-white font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-2 border-2 border-black shadow-[4px_4px_0px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#000] transition-all"
+          >
             Send Invites
             <span className="material-symbols-outlined text-xl">send</span>
           </button>
-          <button className="w-full h-14 bg-transparent text-black font-bold uppercase tracking-widest text-sm flex items-center justify-center border-2 border-black active:translate-x-[1px] active:translate-y-[1px] active:bg-slate-50 transition-all">
+          <button
+            onClick={() => navigate('/draft')}
+            className="w-full h-14 bg-transparent text-black font-bold uppercase tracking-widest text-sm flex items-center justify-center border-2 border-black active:translate-x-[1px] active:translate-y-[1px] active:bg-slate-50 transition-all"
+          >
             Save as Draft
           </button>
         </div>
