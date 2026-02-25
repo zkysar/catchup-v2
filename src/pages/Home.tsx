@@ -24,6 +24,7 @@ const REQUESTS: Request[] = [
     status: 'confirmed',
     date: 'Saturday, 10:00 AM',
     image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC-dv9qAKQ5SRv2Ebwj3pXLCOFw3TJSh0G334exiq1WfkRVEHxihbS3hfoeB-eI7Eajrb-V0OhcBreHZDNFSnRYi-Q4ZMPpp4upaFDNI2tdWv1QLqGWzTe89C0A9R9wkvdBpOjGnroo0Wev0atQDzGK3AOVkT8Z0D6JCSXc_DHNZmKf2HEnT9-2XamilPEjfchpo4C6QngmKnyGWgC4ATVauciufY2MsYynP1bcrd2nBIbz640C61WUg4XSmM_u0iMlgNAKQNLC2g',
+    link: '/confirmed',
     buttonText: 'Details →'
   },
   {
@@ -133,8 +134,9 @@ export default function Home() {
       <div className="flex flex-col gap-8 px-6 pb-6 mt-4">
         {filteredRequests.map((request) => (
           request.status === 'confirmed' && request.image ? (
-            <div
+            <Link
               key={request.id}
+              to={request.link || '#'}
               className="sketch-border offset-shadow bg-white overflow-hidden flex flex-col group transition-transform active:translate-x-1 active:translate-y-1 active:shadow-none"
             >
               <div className="h-48 relative border-b-2 border-ink-black">
@@ -164,12 +166,12 @@ export default function Home() {
                     <img alt="Avatar" className="h-10 w-10 border-2 border-ink-black bg-white object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuISYQEES_5cg1pHPB7oQ5LQmMdoR6jMUeFjjigzYgTJb2hZjKUTuTmmYfXtPb_PaUKC5j7Hs5l-Gr_V0qb0IFgMjYdjRaS7qVcH9LAruKNpx5JiCDmPhyF7NI-QbSO3Iy7iwUEpAL9_iam_P6Rdn8W4mAoyKn7wznOjhw2ugOdJa-lAMMUvUA4vKa4KaLkjQ7n1sF-MDWHJEczomKkSegmfo4P-VyKCnZNZ3Z2lgY1Gg23qlxYxYuA-VtRgIOUAzMcFy-BYsaJA"/>
                     <img alt="Avatar" className="h-10 w-10 border-2 border-ink-black bg-white object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQ-yNzPrwGt1nLIDfS4EFwfHVh2ipQZCYO030ONZ8O93GiBpdy54xPyJFDALHuwRxmoNHZTrp8SoiBDMPYx2iDSNnXpZ6ZH3yRyHdM9TNe36Ng7tKlCfEJODRHhFIzT_iap6xjhv7c__2AwpmYVEUE0buaso8SRc9NUUh79SJmZ4EyScyu4UIA_vitDCZM8mm60o-4Ce2eQT5JTd0zYy0dqsMs9A9PSNxTw-R8hyn8BNVdz-k3BY19yLlGtt_fUh-gIsr4vro32A"/>
                   </div>
-                  <button className="sketch-border offset-shadow-sm px-4 py-1.5 font-hand text-lg font-bold bg-white active:shadow-none translate-y-[-2px]">
+                  <span className="sketch-border offset-shadow-sm px-4 py-1.5 font-hand text-lg font-bold bg-white active:shadow-none translate-y-[-2px]">
                     {request.buttonText}
-                  </button>
+                  </span>
                 </div>
               </div>
-            </div>
+            </Link>
           ) : request.status === 'waiting' && request.image ? (
             <Link
               key={request.id}
