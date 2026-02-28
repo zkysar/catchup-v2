@@ -6,6 +6,7 @@ import NewRequest from './pages/NewRequest';
 import ConfirmDraft from './pages/ConfirmDraft';
 import BlockedDetail from './pages/BlockedDetail';
 import ConfirmedDetail from './pages/ConfirmedDetail';
+import RecipientChat from './pages/RecipientChat';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/confirm" element={<ConfirmDraft />} />
         <Route path="/blocked" element={<BlockedDetail />} />
         <Route path="/confirmed" element={<ConfirmedDetail />} />
+        <Route path="/invite/:token" element={<RecipientChat />} />
       </Routes>
     </Router>
   );
