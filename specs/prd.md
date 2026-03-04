@@ -8,17 +8,9 @@ Coordinating social plans among friends is tedious and often fails due to schedu
 
 ## Goals
 
-### Business Goals
-
-- Achieve 10,000 monthly active users within the first 6 months of launch.
-- Facilitate at least 5,000 successfully completed social plans within the first quarter post-launch.
-- Ensure 75% of all created plans transition to a confirmed state (plan finalized and not abandoned).
-- Maintain a user retention rate of at least 30% at three months post sign-up.
-- Gather NPS feedback from at least 25% of organizers post-event.
-
 ### User Goals
 
-- Reduce time and effort required to agree on a social gathering date and place.
+- Reduce time and effort required to coordinate social gatherings.
 - Allow users to initiate and share a new plan with friends in under 60 seconds.
 - Provide AI-driven suggestions and conflict resolution to avoid endless group chat loops.
 - Ensure all invitees, even those without accounts, can easily contribute availability and receive reminders.
@@ -26,9 +18,10 @@ Coordinating social plans among friends is tedious and often fails due to schedu
 
 ### Non-Goals
 
-- In-app contact management, directory, or native contacts syncing (for MVP).
+- Native contacts syncing (for MVP).
+- Full-featured contact directory or contact management beyond lightweight in-app contacts.
 - Any features designed for corporate, work, or business-related scheduling.
-- Advanced granular data source controls (e.g., per-plan calendar/contact selection).
+- Per-event data source controls (users set calendar and access level once in account settings, not separately for each event).
 - Deep integrations with social media or messaging platforms for auto-invites (organizer shares link externally).
 
 ---
@@ -40,20 +33,20 @@ Coordinating social plans among friends is tedious and often fails due to schedu
 #### Busy Professional (e.g., Alex, 32, Software Engineer)
 
 - As a busy professional, I want to quickly find a common time for my group to meet up, so that it doesn't require endless back-and-forth.
-- As a busy professional, I want to share a plan invite link into my group chat, so that my friends can easily submit availability without having to sign up.
+- As a busy professional, I want to share a plan invite link into my group chat, so that my friends can easily submit availability.
 - As a busy professional, I want AI suggestions for times and venues, so that I don't have to research or think about logistics.
 - As a busy professional, I want to get SMS reminders for events, so that I don't forget plans I committed to.
 
 #### Community Organizer (e.g., Priya, 28, Activity Club Leader)
 
-- As a community organizer, I want to create a plan and collect responses even if people don't have Google accounts, so that anyone in my group can participate.
-- As a community organizer, I want to see which invitees have received SMS reminders and resend to those who haven't, so that everyone is in the loop.
+- As a community organizer, I want to create a plan and collect responses from anyone in my group, regardless of what tools they use.
+- As a community organizer, I want to see which invitees haven't opted into SMS notifications, so I can manually reach out to them since the app has no other way to contact them.
 - As a community organizer, I want invitees to suggest locations, so that we can crowdsource venue ideas when needed.
 
 #### College Student (e.g., Jamie, 20, Student Activities Rep)
 
 - As a college student, I want to use voice or images to describe an event idea, so that I can plan hangouts on the go with minimal typing.
-- As a college student, I want to join plans via a link without creating an account, but also be nudged to sign up for reminders.
+- As a college student, I want to join plans via a link with minimal friction.
 - As a college student, I want to see AI-suggested "next steps" in planning, so that making group plans is fast and fun.
 
 ---
@@ -62,7 +55,7 @@ Coordinating social plans among friends is tedious and often fails due to schedu
 
 ### Plan Creation & Sharing (Priority: Critical)
 
-- **Create Plan:** Organizer can initiate new plan with title, description, and (optionally) voice, text, or image input.
+- **Create Plan:** Organizer initiates a new plan by describing it to the AI via voice or text. Plan details (title, description, timing, etc.) are extracted automatically. Manual editing is available but the AI-driven flow is the primary path.
 - **Share Link:** Organizer receives a plan-specific, shareable link to circulate in any external group chat or channel (WhatsApp, Discord, Slack, etc.).
 - **Plan States:** Plans have clear statuses: Draft → Collecting Availability → Confirmed → Completed/Archived.
 
@@ -70,7 +63,8 @@ Coordinating social plans among friends is tedious and often fails due to schedu
 
 - **AI Chat Agent:** Floating AI chat available on all plan pages, accepts text, voice, and image input.
 - **Proactive Suggestions:** AI surfaces time, venue, and next step suggestions in the form of "chips" or "pills" at appropriate moments (especially when conflicts arise).
-- **Conflict Resolution:** Automatically detect availability/location conflicts and suggest actionable fixes on the plan summary screen.
+- **Calendar Conflicts:** Surface scheduling conflicts detected from connected calendars (e.g., an invitee has a conflicting event) and suggest alternative times.
+- **Response Conflicts:** Identify mismatches across invitee-submitted availability and suggest times that maximize attendance.
 
 ### Invitee Interaction (Priority: Critical)
 
@@ -81,17 +75,17 @@ Coordinating social plans among friends is tedious and often fails due to schedu
 ### Notification System (Priority: High)
 
 - **SMS Notifications:** Plans and reminders are sent via SMS where invitees have opted in; fallback to manual "copy link/message" for non-SMS users.
-- **Organizer Dashboard:** Display which invitees have received reminders and simple 1-click "copy message" button for manual followup.
 
 ### Plan Review & Confirmation (Priority: High)
 
 - **Organizer Controls:** Organizer can see all responses, select timing/location, and confirm plan based on who is available—no requirement that all respond.
+- **Reminder Status:** Display which invitees have received reminders on the plan page itself, with a 1-click "copy message" button for manual followup. A summary card on the home page surfaces plans needing attention.
 - **Location Inputs:** Organizer may allow location suggestions from invitees and review before finalizing.
 
 ### Calendar & Contact Integration (Priority: Medium)
 
-- **Calendar Sync (Optional):** Invitee/organizer can (optionally) connect Google Calendar to share and check availability, but not required for MVP flow to proceed.
-- **Contacts Integration:** Not included in MVP (no in-app contacts list or syncing).
+- **Calendar Sync (Optional):** Invitee/organizer can (optionally) connect Google Calendar to share and check availability, but not required for MVP flow to proceed. Users can choose between free/busy access (read-only) or full calendar read access via a visible toggle.
+- **Contacts Integration:** Lightweight in-app contact management included in MVP. Native contacts syncing is not in scope.
 
 ### Security & Privacy (Priority: High)
 
@@ -111,25 +105,24 @@ Coordinating social plans among friends is tedious and often fails due to schedu
 - Users discover Catchup through direct link sharing, social media, or web search.
 - Landing page features cheery, lightweight, graph-paper aesthetic.
 - Clear CTA to "Create a Plan." Optionally, demo/tutorial bubbles highlight how simple sharing works.
-- First-time creators prompted to name their plan, describe it, and can use text, voice, or upload images to describe the event.
-- Minimal onboarding required for invitees; they access a unique plan link and can participate without creating an account (unless they want SMS reminders).
+- First-time creators are nudged to describe their event idea to the AI via voice or text. Plan details are populated automatically from the conversation.
+- Minimal onboarding required for invitees; they access a unique plan link and can participate immediately.
 
 ### Core Experience
 
 **Step 1:** Organizer lands on Catchup, selects "Create a Plan."
-- Clean form—fields for event name, brief description, and option to use voice or image input (handled with real-time transcription/OCR where needed).
-- Option to specify if invitees can suggest locations.
+- AI-first creation: user is nudged to describe their event idea via voice or text to the AI chat. Plan details (title, description, timing, etc.) are extracted and populated automatically as the conversation progresses. Manual editing of fields is available but not the primary flow.
 - Upon submission, plan link is generated instantly.
 
 **Step 2:** Organizer shares generated link in their preferred group chat/channel.
 - No requirement for invitees to install or sign up.
-- Organizer lands on dashboard showing plan status and a preview of what invitees will see.
+- Organizer sees plan status on the home page and can preview what invitees will see from the plan page.
 
 **Step 3:** Invitees access plan availability page.
 - Prompt to submit name, indicate available times (manual entry or calendar connect), and (if enabled) suggest or vote on locations.
-- Submissions accepted with or without Google account/calendar. Option to create account and receive SMS reminders presented as a nudge.
+- Submissions accepted with or without calendar connection. Option to sign up for SMS reminders presented as a nudge.
 
-**Step 4:** As invitees reply, organizer sees real-time responses on their dashboard.
+**Step 4:** As invitees reply, organizer sees real-time responses on the plan page.
 - Floating AI chat agent visible at all times for organizer—can answer questions, surface timeline and location recommendations, highlight conflicts.
 - Suggestion "pills" below the AI chat quickly recommend actions, e.g., "Choose best time," "Send reminders," "Suggest alternate venue."
 
@@ -143,9 +136,9 @@ Coordinating social plans among friends is tedious and often fails due to schedu
 **Step 7:** Plan auto-archives as "Completed" past the event date.
 - Organizer and invitees can access plan history, but no need to manually archive.
 
-### Advanced Features & Edge Cases
+### Edge Cases
 
-- Power-users can describe plans via voice/image—AI transcribes/processes input for accessibility.
+- Voice and image input supported throughout plan creation—AI transcribes and processes input automatically.
 - Edge case: Invitees without accounts, but same name, lead to potential confusion—host can limit edits to trusted users only.
 - Organizer can re-share plan link at any time; submissions are deduplicated by unique link + invitee name (with optional secondary token for SMS users).
 - If event logistics (time/location) are in conflict, AI proactively surfaces easy-accept suggestions and draws attention to bottlenecks.
@@ -176,58 +169,19 @@ Within a day, the plan is nailed down. Catchup sends confirmations to all attend
 
 ## Success Metrics
 
-### User Adoption
-- Track monthly active users (MAU); target 10,000 MAU within six months.
+For the MVP, success is about validating the core concept rather than hitting growth targets. Key signals to watch:
 
-### Engagement
-- Percentage of plans created that reach "confirmed" state; goal of 75% plan completion.
+### Validation Signals
+- Are plans actually reaching "confirmed" status, or do they stall out?
+- How long does it take an organizer to go from "create" to "share link"?
+- Do invitees who receive a link actually submit availability?
+- Are organizers coming back to create a second plan?
 
-### Conversion
-- % of invitees who sign up after joining via link for SMS reminders; aim for >30%.
-
-### Plan Creation Speed
-- Median time-to-plan (from "create" to "share link"); goal is <60 seconds.
-
-### Business Retention
-- User retention rate at 1, 3, and 6 months; goal is 30% at three months.
-
-### Technical Uptime
-- Service uptime >99.5%.
-
-### Error Rate
-- Cannot exceed 0.5% user-facing errors during core plan creation and submission flows.
-
-### User-Centric Metrics
-
-- MAU and DAU (monthly/daily active users)
-- % of plans reaching "confirmed" and "completed" states
-- Average steps/time to create and share a plan
-- User-reported satisfaction/NPS post-event
-- Number of SMS reminders delivered vs. planned
-
-### Business Metrics
-
-- Plan conversion rate (draft to confirmed)
-- Invitee-to-user conversion rate (% of invitees creating accounts)
-- Cohort retention rates at 1, 3, and 6 months
-- Virality coefficient (average new users per organizer)
-
-### Technical Metrics
-
-- API response times < 500ms
-- 99.5% system uptime
-- SMS delivery success vs. failure rates
-- AI chat model availability and fallback rate
-
-### Tracking Plan
-
-- Number of plans created
-- Unique invitee links generated
-- Availability responses submitted (manual vs. via calendar)
-- SMS reminder sign-ups and deliveries
-- Plan status transitions (draft/collecting/confirmed/completed/archived)
-- AI chat engagement events (suggestion chip/clicks, voice/image usage)
-- Copy-to-clipboard reminders used
+### Lightweight Tracking
+- Number of plans created and their status transitions
+- Availability responses submitted (manual vs. calendar)
+- SMS reminder sign-ups and delivery rates
+- AI chat usage (suggestion chip clicks, voice/image input)
 
 ---
 
@@ -246,12 +200,12 @@ Within a day, the plan is nailed down. Catchup sends confirmations to all attend
 - Google Calendar integration (optional, OAuth as fallback for permissions)
 - SMS gateway (e.g., Twilio or equivalent)
 - Basic image and voice input processing (speech-to-text, OCR)
-- No contacts or messaging app integration (MVP: sharing handled via link)
+- Lightweight in-app contacts; no native contacts syncing or messaging app integration (sharing handled via link)
 
 ### Data Storage & Privacy
 
 - Minimal, explicit data collection: Plan data, invitee names, optional calendar/auth info, SMS numbers.
-- Invitee submissions stored with unique tokens; organizer dashboard maps names to responses.
+- Invitee submissions stored with unique tokens; plan page maps names to responses for the organizer.
 - Opt-in for any personally identifiable info (e.g., SMS or calendar connect).
 - All non-essential data anonymized after plan completion/archival.
 - Compliance: GDPR and relevant privacy standards (privacy by design).
@@ -260,7 +214,7 @@ Within a day, the plan is nailed down. Catchup sends confirmations to all attend
 
 - Designed for rapid spikes during social hours/weekends (estimate support for 100,000 MAU initially).
 - Event and notification processing must support bursty traffic without delay.
-- Fast, real-time updates for organizer dashboards and AI agent.
+- Fast, real-time updates for plan pages and AI agent.
 
 ### Potential Challenges
 
@@ -293,15 +247,15 @@ Lean/Small Team (3–4 total people):
 
 #### 1. Core MVP Build (2 weeks)
 
-- **Deliverables:** Event plan creation flow, shareable plan links, invitee response handling, organizer dashboard, minimal AI chat (text input only), SMS notification integration (basic).
+- **Deliverables:** Event plan creation flow, shareable plan links, invitee response handling, home page with plan cards, plan detail page, AI chat with text/voice/image input, SMS notification integration (basic).
 - **Responsible:** Product/engineering, design (fractional for UI prep).
 - **Dependencies:** SMS gateway service, calendar integration setup.
 
-#### 2. Enrich AI Surface Area (1 week)
+#### 2. Expand AI Suggestions & Conflict Handling (1 week)
 
-- **Deliverables:** Voice and image input for chat, expanded suggestion chips, proactive conflict handling.
-- **Responsible:** Engineers, part-time AI consultant for model integration.
-- **Dependencies:** Speech/vision API access, robust parsing.
+- **Deliverables:** Expanded suggestion chips, proactive conflict handling, calendar conflict detection.
+- **Responsible:** Engineers.
+- **Dependencies:** Calendar integration, robust parsing.
 
 #### 3. Notification & Reminder Polish (1 week)
 
