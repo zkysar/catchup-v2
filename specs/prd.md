@@ -494,7 +494,7 @@ For plans with many participants (threshold: 10+ invitees), real-time per-respon
 
 ### Calendar & Contact Integration (Priority: Medium)
 
-- **Calendar Sync (Optional):** Invitee/organizer can (optionally) connect Google Calendar to check availability, but not required for MVP flow to proceed. Calendar data is never cached server-side; it is fetched on-demand for the plan's date range and discarded after availability is computed. Event titles, descriptions, and attendee details are never exposed to other users or the AI — only free/busy time blocks are shared. The calendar owner sees their own event names during the availability review to help them decide, but the organizer and other invitees only ever see "busy" blocks. Each time calendar data would be shared with a plan, the user is shown a per-plan consent prompt ("Share your availability with [Organizer Name] for this plan?"), even if their calendar is already connected.
+- **Calendar Sync (Optional):** Invitee/organizer can (optionally) connect Google Calendar to check availability, but not required for MVP flow to proceed. Calendar data is never cached server-side; it is fetched on-demand for the plan's date range and discarded after availability is computed. Event titles, descriptions, and attendee details are never exposed to other users or the AI — only free/busy time blocks are shared with the organizer. Fellow invitees cannot see each other's availability data, and anonymous users see no calendar-derived data from other participants. The calendar owner sees their own event names during the availability review to help them decide, but the organizer and other invitees only ever see "busy" blocks. Each time calendar data would be shared with a plan, the user is shown a per-plan consent prompt ("Share your availability with [Organizer Name] for this plan?"), even if their calendar is already connected.
 - **Contacts Integration:** Lightweight in-app contact management included in MVP. Native contacts syncing is not in scope.
 
 ### Security & Privacy (Priority: High)
@@ -502,7 +502,7 @@ For plans with many participants (threshold: 10+ invitees), real-time per-respon
 - **Trust Controls:** Organizer can specify if non-account invitees can revisit and edit their submission (to prevent abuse).
 - **Anonymous Deduplication:** Anonymous submissions are tied to session tokens + display names. Duplicate names are disambiguated for the organizer.
 - **Rate Limiting:** Server-side rate limiting on anonymous submissions to prevent spam/abuse.
-- **Calendar Data Privacy:** Calendar data is fetched on-demand and never cached server-side. Only free/busy blocks are shared with other users and the AI — event titles, descriptions, and attendee lists are never exposed. Per-plan consent is required before sharing calendar availability with an organizer.
+- **Calendar Data Privacy:** Calendar data is fetched on-demand and never cached server-side. Only free/busy blocks are shared with the organizer and the AI — event titles, descriptions, and attendee lists are never exposed. Invitees cannot see each other's availability data; only the organizer sees the aggregated availability grid. Anonymous users see no calendar-derived data from other participants. Per-plan consent is required before sharing calendar availability with an organizer.
 - **Data Privacy:** All data collection explicit; no data sharing with third parties; privacy by design.
 - **Plan Deletion:** Organizer can permanently delete a plan and all associated data.
 
