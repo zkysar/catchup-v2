@@ -21,7 +21,7 @@ Coordinating social plans among friends is tedious and often fails due to schedu
 - Native contacts syncing (for MVP).
 - Full-featured contact directory or contact management beyond lightweight in-app contacts.
 - Any features designed for corporate, work, or business-related scheduling.
-- Per-event data source controls (users set calendar and access level once in account settings, not separately for each event).
+- Per-event data source controls beyond the per-plan consent prompt (users connect their calendar once in account settings, but confirm sharing on each plan).
 - Deep integrations with social media or messaging platforms for auto-invites (organizer shares link externally).
 
 ---
@@ -219,8 +219,9 @@ An invitee who accesses a plan via shared link without creating an account.
 1. Signed-up invitee clicks "Connect Calendar" on the plan page.
 2. Google OAuth flow completes (if not already connected in account settings).
 3. System reads the invitee's calendar for the plan's date range.
-4. Free/busy blocks or full event details are displayed (depending on the user's access-level setting in their account).
-5. Invitee reviews auto-detected availability, optionally adjusts, and submits.
+4. A per-plan consent prompt is shown: "Share your availability with [Organizer Name] for this plan?" Invitee confirms.
+5. Free/busy blocks are fetched for the plan's date range. The invitee sees their own event names to help them decide, but only free/busy blocks are shared with the organizer — event titles and details are never exposed.
+6. Invitee reviews auto-detected availability, optionally adjusts, and submits. Calendar data is discarded server-side after availability is computed.
 
 #### Happy Path (Manual Entry)
 1. Invitee (anonymous or signed-up without calendar) sees a time-slot grid for the plan's date range.
@@ -246,7 +247,7 @@ An invitee who accesses a plan via shared link without creating an account.
 - This response is surfaced to the organizer with the note. AI may incorporate it into alternative suggestions.
 
 #### Edge Cases
-- **Calendar shows all-day "OOO" event:** System treats this as unavailable for the entire day unless the user manually overrides. Free/busy mode shows blocked; full-access mode shows the event title so the user can decide. By default, all-day events (OOO, vacation, travel) are treated as hard blocks that cannot be skipped. The system infers skip-ability: multi-day OOO/vacation events are always hard blocks; single-day all-day events (e.g., "Laundry day") are treated as soft blocks that the user can override. When in doubt, default to hard block -- it's better to ask the user than to assume they can skip something.
+- **Calendar shows all-day "OOO" event:** System treats this as unavailable for the entire day unless the user manually overrides. The calendar owner sees event names on their own screen to help them decide; the organizer only sees a "busy" block. By default, all-day events (OOO, vacation, travel) are treated as hard blocks that cannot be skipped. The system infers skip-ability: multi-day OOO/vacation events are always hard blocks; single-day all-day events (e.g., "Laundry day") are treated as soft blocks that the user can override. When in doubt, default to hard block -- it's better to ask the user than to assume they can skip something.
 - **Calendar has tentative events:** Tentative events are shown as "possibly busy" with a visual distinction from confirmed busy blocks. User can override.
 - **Calendar disconnect mid-flow:** If OAuth token expires or is revoked during the session, the system gracefully falls back to manual entry with a message: "Calendar connection lost. You can enter availability manually."
 - **Invitee submits then wants to change:** Signed-up invitees can always edit. Anonymous invitees can edit only if (a) the organizer has allowed anonymous edits AND (b) they still have their browser session token.
@@ -274,8 +275,8 @@ An invitee who accesses a plan via shared link without creating an account.
 
 #### Scenario: Calendar Conflict Detected
 1. Organizer proposes Saturday 2pm for brunch.
-2. Signed-up invitee Alex has connected their calendar, which shows a dentist appointment 1:30-2:30pm Saturday.
-3. AI surfaces this: "Alex has a conflict Saturday 2-2:30pm. Would 3pm work instead?"
+2. Signed-up invitee Alex has connected their calendar, which shows a conflict 1:30-2:30pm Saturday (event details are not exposed — only Alex sees the event name on their own screen).
+3. AI surfaces this to the organizer: "Alex is busy Saturday 2-2:30pm. Would 3pm work instead?"
 4. Organizer can accept the suggestion, override (proceed anyway), or ask Alex directly via the plan chat.
 
 #### Scenario: Organizer Changes Date After Responses
@@ -493,7 +494,7 @@ For plans with many participants (threshold: 10+ invitees), real-time per-respon
 
 ### Calendar & Contact Integration (Priority: Medium)
 
-- **Calendar Sync (Optional):** Invitee/organizer can (optionally) connect Google Calendar to share and check availability, but not required for MVP flow to proceed. Users choose between free/busy access (read-only) or full calendar read access via a visible toggle in account settings (set once, applies to all plans).
+- **Calendar Sync (Optional):** Invitee/organizer can (optionally) connect Google Calendar to check availability, but not required for MVP flow to proceed. Calendar data is never cached server-side; it is fetched on-demand for the plan's date range and discarded after availability is computed. Event titles, descriptions, and attendee details are never exposed to other users or the AI — only free/busy time blocks are shared. The calendar owner sees their own event names during the availability review to help them decide, but the organizer and other invitees only ever see "busy" blocks. Each time calendar data would be shared with a plan, the user is shown a per-plan consent prompt ("Share your availability with [Organizer Name] for this plan?"), even if their calendar is already connected.
 - **Contacts Integration:** Lightweight in-app contact management included in MVP. Native contacts syncing is not in scope.
 
 ### Security & Privacy (Priority: High)
@@ -501,6 +502,7 @@ For plans with many participants (threshold: 10+ invitees), real-time per-respon
 - **Trust Controls:** Organizer can specify if non-account invitees can revisit and edit their submission (to prevent abuse).
 - **Anonymous Deduplication:** Anonymous submissions are tied to session tokens + display names. Duplicate names are disambiguated for the organizer.
 - **Rate Limiting:** Server-side rate limiting on anonymous submissions to prevent spam/abuse.
+- **Calendar Data Privacy:** Calendar data is fetched on-demand and never cached server-side. Only free/busy blocks are shared with other users and the AI — event titles, descriptions, and attendee lists are never exposed. Per-plan consent is required before sharing calendar availability with an organizer.
 - **Data Privacy:** All data collection explicit; no data sharing with third parties; privacy by design.
 - **Plan Deletion:** Organizer can permanently delete a plan and all associated data.
 
@@ -685,7 +687,7 @@ For the MVP, success is about validating the core concept rather than hitting gr
 
 ### Integration Points
 
-- Google Calendar integration (optional, OAuth; user configures free/busy vs. full access once in account settings)
+- Google Calendar integration (optional, OAuth with minimal scope — `calendar.freebusy` or `calendar.readonly`, never write access; only free/busy data is shared with other users; per-plan consent required; no server-side caching of calendar data)
 - SMS gateway (e.g., Twilio or equivalent) with STOP keyword compliance
 - Basic image and voice input processing (speech-to-text, OCR/vision)
 - Lightweight in-app contacts; no native contacts syncing or messaging app integration (sharing handled via link)
