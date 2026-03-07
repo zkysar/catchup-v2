@@ -246,7 +246,7 @@ An invitee who accesses a plan via shared link without creating an account.
 - This response is surfaced to the organizer with the note. AI may incorporate it into alternative suggestions.
 
 #### Edge Cases
-- **Calendar shows all-day "OOO" event:** System treats this as unavailable for the entire day unless the user manually overrides. Free/busy mode shows blocked; full-access mode shows the event title so the user can decide.
+- **Calendar shows all-day "OOO" event:** System treats this as unavailable for the entire day unless the user manually overrides. Free/busy mode shows blocked; full-access mode shows the event title so the user can decide. By default, all-day events (OOO, vacation, travel) are treated as hard blocks that cannot be skipped. The system infers skip-ability: multi-day OOO/vacation events are always hard blocks; single-day all-day events (e.g., "Laundry day") are treated as soft blocks that the user can override. When in doubt, default to hard block -- it's better to ask the user than to assume they can skip something.
 - **Calendar has tentative events:** Tentative events are shown as "possibly busy" with a visual distinction from confirmed busy blocks. User can override.
 - **Calendar disconnect mid-flow:** If OAuth token expires or is revoked during the session, the system gracefully falls back to manual entry with a message: "Calendar connection lost. You can enter availability manually."
 - **Invitee submits then wants to change:** Signed-up invitees can always edit. Anonymous invitees can edit only if (a) the organizer has allowed anonymous edits AND (b) they still have their browser session token.
@@ -364,12 +364,20 @@ An invitee who accesses a plan via shared link without creating an account.
 | Trigger | Recipients | Channel | Content |
 |---|---|---|---|
 | Plan created | Organizer only | In-app | "Your plan [Title] is ready. Share the link!" |
-| Availability submitted | Organizer | In-app (real-time) | "[Name] submitted their availability" |
+| Availability submitted | Organizer | In-app (real-time) | "[Name] submitted their availability" (batched for large plans) |
 | Plan details changed | Opted-in invitees | SMS | "[Plan] details updated. Review: [link]" |
 | Plan confirmed | Opted-in invitees | SMS + in-app | "[Plan] is confirmed for [date/time] at [location]" |
 | Reminder (24h before) | Opted-in invitees | SMS | "Reminder: [Plan] is tomorrow at [time]. [location]" |
 | Reminder (2h before) | Opted-in invitees | SMS | "[Plan] starts in 2 hours at [location]" |
 | Plan archived | None | System auto | No notification; plan moves to history |
+
+#### Notification Batching for Large Plans
+
+For plans with many participants (threshold: 10+ invitees), real-time per-response notifications to the organizer become spammy. Instead:
+- **RSVP digest batching:** Individual "X submitted availability" notifications are grouped into periodic digests rather than firing individually. Batching interval: every 15 minutes while responses are actively coming in, or every hour during quiet periods.
+- **Digest format:** "3 new responses for [Plan]: Jamie, Marcus, and Sophie submitted availability. 8 of 15 invitees have responded."
+- **Threshold behavior:** Plans with fewer than 10 invitees use real-time individual notifications (current behavior). Plans with 10+ use batched digests. The organizer can toggle between real-time and batched in plan settings if they prefer one over the other.
+- **Confirmation and reminder SMS are never batched** -- these are always sent individually and immediately to each opted-in invitee.
 
 #### Fallback for Non-SMS Invitees
 - Organizer's plan page shows a "Notification Status" column:
